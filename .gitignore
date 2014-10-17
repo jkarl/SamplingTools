@@ -3,3 +3,5 @@ Test_Geodata/
 ArcGIS_Sampling_Plugin/
 Scripts/
 .Rproj.user
+.Rproj
+.Rhistory

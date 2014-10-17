@@ -21,15 +21,16 @@ shinyUI(fluidPage(
       uiOutput("ChooseValueField"),
       HTML("<br>"),
       h4("Analysis Options"),
-      selectInput("AnalysisType","Analysis Type",c("Threshold Test","Two Independent Samples","Repeated Measures")),
+      #selectInput("AnalysisType","Analysis Type",c("Threshold Test","Two Independent Samples","Repeated Measures")),
       checkboxInput("PropData","Proportion Data?",value=FALSE),
       numericInput("MDD","Desired MDD (% change)",0.15,min=0.01,max=9999,step=0.01),
-      numericInput("Alpha","Type I Error Rate (Alpha)",0.05,min=0.01,max=0.99,step=0.01),
+      numericInput("Alpha","Significance Level (Alpha)",0.05,min=0.01,max=0.99,step=0.01),
       numericInput("Rho","Intraobservation Correlation",0.6,min=0.0,max=0.99,step=0.01),
       
       HTML("<br>"),
-      h4("Output Options"),
-      sliderInput("bins","Number of Bins:",min=1,max=50,value=30)
+      actionButton("goButton","Rerun Analysis")
+      #h4("Output Options"),
+      #sliderInput("bins","Number of Bins:",min=1,max=50,value=30)
       
       
       ),
@@ -38,13 +39,19 @@ shinyUI(fluidPage(
   #######################################################################################
   mainPanel(  #Initializes the main panel
     tabsetPanel(
-      tabPanel('Data Table', dataTableOutput("DataTable")),
-      tabPanel('Results Table', dataTableOutput("ssResults"))),
+      tabPanel('Instructions',HTML("Lorem ipsum...")),
+      tabPanel('Input Data Table', dataTableOutput("DataTable")),
+      tabPanel('Results Table', dataTableOutput("ssResults"),
+               plotOutput("powerPlot"),
+               HTML("<hr>"),
+               downloadButton("downloadTable","Download Tabular Results"),
+               downloadButton("downloadPlot","Save Plot to Image")
+               )
+      ),
+    #HTML("<hr>"),
+    #plotOutput("powerPlot"),
+
     HTML("<hr>"),
-    plotOutput("powerPlot"),
-    HTML("<hr>"),
-    downloadButton("downloadTable","Download Tabular Results"),
-    downloadButton("downloadPlot","Save Plot to Image"),
     wellPanel(h5("Output Messages"),
     textOutput("testText"))   
     )
