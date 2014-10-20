@@ -8,21 +8,16 @@ data <- reactiveValues()
 
 shinyServer(function(input,output) {
   
-  output$contents <- renderTable({
-    
-    # assign input file
-    inFile <- input$file1
-    
-    if(is.null(inFile))
-      return(NULL)
-    
-    data$data1 <- read.csv(inFile$datapath, header=input$header, sep=input$sep)
-    
-  })
 
+  ##########################################################################
+  ## Set up UI fields
+  ##########################################################################
   output$choose_indicator <- renderUI({
     if(is.null(input$file1))
       return()
+    
+    inFile <- input$file1
+    data$data1 = read.csv(inFile$datapath,header=TRUE)
     
     fields <- names(data$data1)
     selectInput("indicator", "Select Indicator Field", choices = fields)
@@ -57,20 +52,32 @@ shinyServer(function(input,output) {
       return()
     
     fields <- names(data$data1)
-    selectInput("stratum_field", "Select Stratum Field", choices = as.list(c("none",fields)))
+    selectInput("stratum_field", "Select Stratum Field", choices = cbind("none",fields),selected="none")
   })
   
   output$choose_stratum <- renderUI({
     if(is.null(input$file1))
       return()
     
-    if(input$stratum_field=="none")
+    tst = input$stratum_field
+    if(is.null(input$stratum_field))
       return()
     
     strata <- levels(data$data1[[input$stratum_field]])
     selectInput("stratum", "Select Stratum", choices = strata)
   })
 
+  
+  ##########################################################################
+  ## Render input data table
+  ##########################################################################
+  output$contents <- renderDataTable({
+    # assign input file
+    if(is.null(input$file1))
+      return(NULL)
+    data$data1
+  }, options=list(pageLength=10))
+  
   output$title <- renderText({
     if(is.null(input$file1))
       return()
@@ -80,8 +87,9 @@ shinyServer(function(input,output) {
       return(paste("Horwitz-Thompson Estimates for stratum ",input$stratum,sep=""))
   })
   
-  #calc estimators and print
-  
+  ##########################################################################
+  ## Calc estimators and output results
+  ##########################################################################
   output$HVestimate <- renderPrint({
     if(is.null(input$file1))
       return()
@@ -101,8 +109,11 @@ shinyServer(function(input,output) {
     total.est(ind[obs], wgt[obs], x=x[obs], y=y[obs], vartype="local")
   })
   
+  
+  
+  
   #Generate plot
-  output$mpgPlot <- renderPlot({
+  output$boxPlot <- renderPlot({
     boxplot(as.formula(formulaText()),
             data = mpgData,
             outline = input$outliers)

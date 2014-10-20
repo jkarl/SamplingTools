@@ -2,7 +2,6 @@ library(shiny)
 
 # Define UI for application that calculates sample sizes and sampling sufficiency from a set of input data
 shinyUI(fluidPage(
-  
   #Application Title
   titlePanel("Sample Sufficiency Calculator"),
   
@@ -28,7 +27,9 @@ shinyUI(fluidPage(
       numericInput("Rho","Intraobservation Correlation",0.6,min=0.0,max=0.99,step=0.01),
       
       HTML("<br>"),
-      actionButton("goButton","Rerun Analysis")
+      actionButton("goButton",h4("Rerun Analysis")),
+      HTML("<br><br>"),
+      img(src="http://jornada.nmsu.edu/sites/jornada.nmsu.edu/files/JornadaLogo.png")
       #h4("Output Options"),
       #sliderInput("bins","Number of Bins:",min=1,max=50,value=30)
       
