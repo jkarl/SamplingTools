@@ -1,9 +1,12 @@
 library(shiny)
 
+htmlText = '<p>This tool allows for calculation of sampling sufficiency based on observed and desired minimum detectable difference (MDD or effect size) from a set of sample data. This tool can also be used to estimate sample sizes necessary to meet monitoring objectives from pilot data.</p><p>To use this tool, upload a DIMA indicator report file (Excel). Select the Results tab to calculate sampling sufficiency and see tabular and graphical results.</p>'
+
+
 # Define UI for application that calculates sample sizes and sampling sufficiency from a set of input data
 shinyUI(fluidPage(
   #Application Title
-  titlePanel("Sample Sufficiency Calculator"),
+  titlePanel("AIM Sampling Sufficiency Calculator"),
   
   #######################################################################################
   ## Sidebar for inputs and options
@@ -20,7 +23,7 @@ shinyUI(fluidPage(
       uiOutput("ChooseValueField"),
       HTML("<br>"),
       h4("Analysis Options"),
-      #selectInput("AnalysisType","Analysis Type",c("Threshold Test","Two Independent Samples","Repeated Measures")),
+      selectInput("analysisType","Analysis Type",c("Threshold Test","Two Independent Samples","Repeated Measures")),
       checkboxInput("PropData","Proportion Data?",value=FALSE),
       numericInput("MDD","Desired MDD (% change)",0.15,min=0.01,max=9999,step=0.01),
       numericInput("Alpha","Significance Level (Alpha)",0.05,min=0.01,max=0.99,step=0.01),
@@ -40,7 +43,7 @@ shinyUI(fluidPage(
   #######################################################################################
   mainPanel(  #Initializes the main panel
     tabsetPanel(
-      tabPanel('Instructions',HTML("Lorem ipsum...")),
+      tabPanel('Instructions',HTML(htmlText)),
       tabPanel('Input Data Table', dataTableOutput("DataTable")),
       tabPanel('Results Table', dataTableOutput("ssResults"),
                plotOutput("powerPlot"),
@@ -48,13 +51,9 @@ shinyUI(fluidPage(
                downloadButton("downloadTable","Download Tabular Results"),
                downloadButton("downloadPlot","Save Plot to Image")
                )
-      ),
-    #HTML("<hr>"),
-    #plotOutput("powerPlot"),
-
-    HTML("<hr>"),
-    wellPanel(h5("Output Messages"),
-    textOutput("testText"))   
+      )
+    
     )
-  ) 
+  ),
+  HTML("footer goes here...")
   ))

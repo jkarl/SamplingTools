@@ -12,7 +12,7 @@ shinyServer(function(input,output,session) {
   ## Define function for calculating power
   #######################################################################################
   power <- reactive({
-    #input$goButton  # Dependency on goButton click
+    input$goButton  # Dependency on goButton click
     
     if(is.null(input$file1)) {
       return(NULL)
@@ -28,6 +28,9 @@ shinyServer(function(input,output,session) {
     indField = input$IndicatorField
     valField = input$Values
     stratField = input$StrataField
+    anType = input$analysisType
+    rho = input$Rho
+    prop = input$PropData
     nRange = seq(3,100)
     a$results.tab = data.frame(matrix(nrow=1,ncol=9))
     names(a$results.tab)=c("stratum","indicator","mean","stdev","n.actual","coef.var","actualMDD","power","n.desired.mdd")
@@ -46,11 +49,34 @@ shinyServer(function(input,output,session) {
         cv <- xbar1/sqrt(s1)
         xbar2 = xbar1 + mddPct*xbar1
         if (xbar2<0) xbar2=0; if(xbar2>1) xbar2=1
-        sp = sqrt( (n-1)*s1/n  )
-        d = (xbar2-xbar1)/sp
-        p = pwr.t.test(n=n,d=d,sig.level=alpha,type="one.sample",alternative="two.sided")$power
-        desired.n = pwr.t.test(power=0.8,d=d,sig.level=alpha,type="one.sample",alternative="two.sided")$n
-        #print(paste(strat,l,p,sep=", "))
+        
+        ## Calculate effect size (actual MDD) and power based on selected analysis type: "Threshold Test","Two Independent Samples","Repeated Measures"
+        if (anType=="Threshold Test") {
+          sp = sqrt( (n-1)*s1/n  )
+          d = (xbar2-xbar1)/sp
+          type = "one.sample"
+          altern = "two.sided"
+        } else if (anType=="Two Independent Samples") {
+          sp = sqrt( (n-1)*s1/n  )
+          d = (xbar2-xbar1)/sp
+          type = "two.sample"
+          altern = "two.sided"
+        } else {  # assume paired
+          sp = sqrt( (n-1)/n*s1*2*(1-rho) )
+          d = (xbar2-xbar1)/sp
+          type = "paired"
+          altern = "two.sided"
+        }
+        
+        if (prop) {
+          p = pwr.p.test(n=n,h=d,sig.level=alpha,alternative=altern)$power
+          desired.n = pwr.p.test(power=0.8,h=d,sig.level=alpha,alternative=altern)$n
+        } else {
+          p = pwr.t.test(n=n,d=d,sig.level=alpha,type=type,alternative=altern)$power
+          desired.n = pwr.t.test(power=0.8,d=d,sig.level=alpha,type=type,alternative=altern)$n        
+        }
+        
+        
         
         #Write results to the table
         a$results.tab = rbind(a$results.tab,c(strat,l,xbar1,sqrt(s1),n,cv,d,p,desired.n))
@@ -80,31 +106,59 @@ shinyServer(function(input,output,session) {
   #######################################################################################
   ## Load the data and display messages for errors
   #######################################################################################
-  output$testText <- renderPrint({
+  #output$testText <- renderPrint({
+  #  infile = input$file1
+  #  
+  #  if(is.null(infile))
+  #    return("No file selected.")
+  #  
+  #  if(infile$type=="text/csv") {
+  #    a$data = read.csv(infile$datapath,header=TRUE)
+  #  } else {
+  #    if(infile$type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+  #      a$data = read.xlsx(infile$datapath,sheetName="Line Totals")
+  #    } else {
+  #      return(paste("Cannot load file type:",infile$type,sep=' '))
+  #    }
+  #  }    
+  #  return("Data file successfully loaded.")  
+  #})
+  
+  #  loadData <- reactive({
+  #    infile = input$file1
+  #    
+  #    if(is.null(infile))
+  #      return(NULL)
+  #    
+  #    if(infile$type=="text/csv") {
+  #      a$data = read.csv(infile$datapath,header=TRUE)
+  #    } else {
+  #      if(infile$type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+  #        a$data = read.xlsx(infile$datapath,sheetName="Line Totals")
+  #      }
+  #    }    
+  #    
+  #  })
+    
+
+  
+  #######################################################################################
+  ## Finish UI Setup - populate combo boxes depending on file upload
+  #######################################################################################
+  output$ChooseStrata <- renderUI({
     infile = input$file1
     
     if(is.null(infile))
-      return("No file selected.")
+      return(NULL)
     
     if(infile$type=="text/csv") {
       a$data = read.csv(infile$datapath,header=TRUE)
     } else {
       if(infile$type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
         a$data = read.xlsx(infile$datapath,sheetName="Line Totals")
-      } else {
-        return(paste("Cannot load file type:",infile$type,sep=' '))
       }
     }    
     
-    return("Data file successfully loaded.")
-    
-    
-  })
-  
-  #######################################################################################
-  ## Finish UI Setup - populate combo boxes depending on file upload
-  #######################################################################################
-  output$ChooseStrata <- renderUI({
     if(is.null(input$file1))
       { fields <- '' }
     else
