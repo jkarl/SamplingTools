@@ -155,7 +155,7 @@ shinyServer(function(input,output,session) {
       a$data = read.csv(infile$datapath,header=TRUE)
     } else {
       if(infile$type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-        a$data = read.xlsx(infile$datapath,sheetName="Line Totals")
+        a$data = read.xlsx(infile$datapath,sheetName="Plot Totals")
       }
     }    
     
