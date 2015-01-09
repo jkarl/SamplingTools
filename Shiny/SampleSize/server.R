@@ -3,10 +3,10 @@ library(xlsx)
 library(pwr)
 library(ggplot2)
 
-a <- reactiveValues()
-
 #Define server logic for Shiny app
 shinyServer(function(input,output,session) {
+  
+  a <- reactiveValues()
   
   #######################################################################################
   ## Define function for calculating power

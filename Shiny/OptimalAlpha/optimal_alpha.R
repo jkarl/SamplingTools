@@ -76,6 +76,31 @@ optab.plot <- function(n1=NULL,n2=NULL,d=NULL,a_range=c(0,1),step=0.001,T1T2crat
     p+theme(text=element_text(size=18),axis.text.y=element_text(angle=90))
 }
 
+effect.size <- function(x1,n1,s1,type,pctChg,x2,n2,s2,paired,threshold=0){
+  rho = 0.6
+  if(type=="pct"){
+    xd <- x1*pctChg/100
+    if(paired) {
+      sp = sqrt( (n1-1)/n1*s1*2*(1-rho) )
+    } else {
+      sp <- sqrt( (n1-1)*s1/n1  )
+    }
+  } else if (type=="two.sample") {
+    xd <- abs(x1-x2)
+    sp <- sqrt(((n1-1)*s1+(n2-1)*s2)/(n1+n2-2))
+  } else { # Threshold
+    xd <- abs(x1-threshold)
+    if(paired) {
+      sp = sqrt( (n1-1)/n1*s1*2*(1-rho) )
+    } else {
+      sp <- sqrt( (n1-1)*s1/n1  )
+    }
+  }
+  d <- xd/sp
+  return(d)
+}
+
+
 #The function used to calculate optimal alphas is: optab(n1=NULL,n2=NULL,d=NULL,T1T2cratio=1,HaHopratio=1,type = c("two.sample", "one.sample", "paired"),tails = c("two.tailed","one.tailed"))
 #The arguments 'n1' and 'n2' are the samples sizes of each group (for a one sample test, enter any value >=3 for n2, n2 will be ignored)
 #The argument 'd' is the 'Cohen's d' standardized critical effect size. Cohen's d = difference between group means/pooled within group standard deviation
