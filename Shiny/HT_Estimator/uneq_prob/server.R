@@ -27,16 +27,16 @@ shinyServer(function(input,output) {
     if(is.null(input$file1))
       return()
     
-    fields <- names(data$data1)
-    selectInput("weight", "Select Weight Field", choices = fields)
+    fields <- cbind("none",names(data$data1))
+    selectInput("weight", "Select Weight Field (optional)", choices = fields, selected="none")
   })
   
   output$choose_x <- renderUI({
     if(is.null(input$file1))
       return()
     
-    fields <- names(data$data1)
-    selectInput("x", "Select X-coordinate Field", choices = fields)
+    fields <- cbind("none",names(data$data1))
+    selectInput("x", "Select X-coordinate Field (optional)", choices = fields, selected="none")
   })
   
   output$choose_y <- renderUI({
@@ -44,15 +44,15 @@ shinyServer(function(input,output) {
       return()
     
     fields <- names(data$data1)
-    selectInput("y", "Select Y-coordinate Field", choices = fields)
+    selectInput("y", "Select Y-coordinate Field (optional)", choices = cbind("none",fields), multiple=FALSE, selected="none")
   })
 
   output$choose_stratum_field <- renderUI({
     if(is.null(input$file1))
       return()
     
-    fields <- names(data$data1)
-    selectInput("stratum_field", "Select Stratum Field", choices = cbind("none",fields),selected="none")
+    fields <- cbind("none",names(data$data1))
+    selectInput("stratum_field", "Select Stratum Field", choices = fields, selected="none")
   })
   
   output$choose_stratum <- renderUI({
@@ -60,7 +60,7 @@ shinyServer(function(input,output) {
       return()
     
     tst = input$stratum_field
-    if(is.null(input$stratum_field))
+    if(is.null(input$stratum_field)||input$stratum_field=="none")
       return()
     
     strata <- levels(data$data1[[input$stratum_field]])
@@ -94,29 +94,28 @@ shinyServer(function(input,output) {
     if(is.null(input$file1))
       return()
     
-    wgt <- 10000/data$data1[[input$weight]]
+
+    
     ind <- data$data1[[input$indicator]]
     x <- data$data1[[input$x]]
     y <- data$data1[[input$y]]
     
+    if(input$weight==""||input$weight=="none")
+      wgt <- rep_len(1/nrow(data$data1),nrow(data$data1))
+    else
+      wgt <- 10000/data$data1[[input$weight]]
+    
     strata <- data$data1[[input$stratum_field]]
     stratum <- input$stratum
-    if(input$stratum_field=="none")
+    if(input$stratum_field==""||input$stratum_field=="none")
       obs <- seq(1,length(data$data1[,1]))
     else
       obs <- which(data$data1[[input$stratum_field]]==stratum)
     
-    total.est(ind[obs], wgt[obs], x=x[obs], y=y[obs], vartype="local")
-  })
-  
-  
-  
-  
-  #Generate plot
-  output$boxPlot <- renderPlot({
-    boxplot(as.formula(formulaText()),
-            data = mpgData,
-            outline = input$outliers)
+    if ((is.null(input$x)||is.null(input$y))||(input&x=="none"||input$y=="none"))
+      total.est(ind[obs],wgt[obs],vartype="SRS")
+    else
+      total.est(ind[obs], wgt[obs], x=x[obs], y=y[obs], vartype="local")
   })
   
 })
