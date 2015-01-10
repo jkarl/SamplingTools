@@ -28,10 +28,12 @@ shinyUI(fluidPage(
               verbatimTextOutput("optabOut"),
               h3("Optimal Alpha Graph"),
               plotOutput("optabPlot",width="100%",height="400px")),
-        tabPanel("Effect Size",h4("Effect Size Explained"),p("Effect size is the magnitude of difference between two groups. For a useful statistical test, you should first determine what a meaningful effect size is. 
-                                                           There are many different ways to calculate effect size. The optimal error rate tool uses the Cohen's D standardized effect size which is a
-                                                           unitless number that is a difference in means divided by a pooled standard deviation. Depending on the test and options, there are different forumulas for
-                                                           calculating Cohen's D. You can use the calculator below and input the result in the Effect Size box at the left."),
+        tabPanel("Effect Size",h4("Effect Size Explained"),
+                 HTML("Effect size is the magnitude of difference between two groups. For a useful statistical test, you should first determine what a meaningful effect size is. 
+                    There are many different ways to <a href='http://en.wikipedia.org/wiki/Effect_size' target='_blank'>calculate effect size</a>. The optimal error rate tool uses 
+                    the <a href='http://en.wikiversity.org/wiki/Cohen%27s_d' target='_blank'>Cohen's D standardized effect size</a> which is a
+                    unitless number that is a difference in means divided by a pooled standard deviation. Depending on the test and options, there are different forumulas for
+                    calculating Cohen's D. You can use the calculator below and input the result in the Effect Size box at the left."),
                  hr(),
                  h4("Effect Size Inputs"),
                  selectInput("EStype",label="Select Type",choices=list("Percent Change of a Mean"="pct","Test Against a Threshold"="threshold","Compare Two Samples"="two.sample")),
@@ -54,10 +56,21 @@ shinyUI(fluidPage(
                  h4("Calculated effect size is: ",textOutput("CohensD",inline=TRUE)),
                  hr(),
                  h4("Helpful Links"),
-                 a(src="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3444174/","Using Effect Size-or Why the P Value Is Not Enough, Journal of Graduate Medical Education article"),br(),
-                 a(src="http://en.wikipedia.org/wiki/Effect_size", "Wikipedia: Effect Size"),br(),
-                 a(src="http://en.wikiversity.org/wiki/Cohen%27s_d", "Wikiversity: Cohen's D")),
-        tabPanel("More Info", "Lorem ipsum...",
+                 HTML("<ul>
+                    <li><a src='http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3444174/' target='_blank'>Using Effect Size-or Why the P Value Is Not Enough, Journal of Graduate Medical Education article</a></li>
+                    <li><a src='http://en.wikipedia.org/wiki/Effect_size' target='_blank'>Wikipedia: Effect Size</a></li>
+                    <li><a src='http://en.wikiversity.org/wiki/Cohen%27s_d' target='_blank'>Wikiversity: Cohen's D</a></li>
+                    </ul>")
+                 ),
+        tabPanel("More Info", p("In the context of natural resource monitoring, failing to detect a change (Type II error) can be more harmful and costly than falsely claiming that a change occurred (Type I error).
+                                Rather than using arbitrary error rates (e.g., alpha = 0.05) for statitical analyses and tests which may lead to increased likelihood of making Type II errors, both error rates should be set at levels that minimize the chance of making any type of error.
+                                Because Type I and II error rates are related, the optimal error rate is the alpha level (Type I error rate) that minimizes the probability of Type I and Type II errors for given sample and effect sizes
+                                (see Mudge et al. 2012a, 2012b). The optimal error rate can be adjusted to account for differential costs of the different types of errors and for expectations 
+                                (i.e., prior probabilities) of the likelihood of change occurring (or not occurring)."),
+                 p("This tool uses R code provided by Mudge et al. (2012a) to calculate optimal Type I error rates. Specifically, this Shiny tool executes the following function:"),
+                 pre("optab(n1,n2,d,type,tails,T1T2cratio,HaHopratio"),
+                 p("where n1 and n2 are sample sizes, d is Cohen's effect size, type is the type of t-Test (one sample, two-sample, paired), tails refers to whether the test is for a one-tailed or two-tailed alternative, T1T2cratio = the cost ration of Type I to Type II errors, and HaHopratio is the ratio of prior probabilities. A companion function was written to produce the plot showing how error rates change as Type I error rate goes from zero to one:"),
+                 pre("optab.plot(n1,n2,d,type,tails,T1T2cratio,HaHopratio)"),
                  h4("References"),
                  HTML("<ul><li>Mudge, Joseph F., Leanne F. Baker, Christopher B. Edge, and Jeff E. Houlahan. “Setting an Optimal Α That Minimizes Errors in Null Hypothesis Significance Tests.” Edited by Zheng Su. PLoS ONE 7, no. 2 (February 28, 2012): e32734. doi:<a href='http://dx.doi.org/10.1371/journal.pone.0032734' target='_blank'>10.1371/journal.pone.0032734</a>.
 </li><li>Mudge, Joseph F., Timothy J. Barrett, Kelly R. Munkittrick, and Jeff E. Houlahan. “Negative Consequences of Using Α = 0.05 for Environmental Monitoring Decisions: A Case Study from a Decade of Canada’s Environmental Effects Monitoring Program.” Environmental Science & Technology 46, no. 17 (September 4, 2012): 9249–55. doi:<a href='http://dx.doi.org/10.1021/es301320n' target='_blank'>10.1021/es301320n</a>.
