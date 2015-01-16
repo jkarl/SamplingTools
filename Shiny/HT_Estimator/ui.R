@@ -1,7 +1,7 @@
 library(shiny)
 
 shinyUI(fluidPage(
-  tags$head(includeScript="google_analytics.js"),
+  tags$head(includeScript("google_analytics.js")),
   titlePanel("Simple Horwitz-Thompson Indicator Estimator"),
   
   sidebarLayout(

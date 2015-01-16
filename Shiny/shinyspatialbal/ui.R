@@ -9,6 +9,7 @@ shinyUI(pageWithSidebar(
 
   sidebarPanel(
     tags$head(
+      includeScript('google_analytics.js'),
       tags$style(type="text/css", "select { max-width: 250px; }"),
       tags$style(type="text/css", "textarea { max-width: 250px; }"),
       tags$style(type="text/css", ".jslider { max-width: 250px; }"),

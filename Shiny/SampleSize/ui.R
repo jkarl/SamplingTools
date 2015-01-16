@@ -5,7 +5,7 @@ htmlText = '<p>This tool allows for calculation of sampling sufficiency based on
 
 # Define UI for application that calculates sample sizes and sampling sufficiency from a set of input data
 shinyUI(fluidPage(
-  tags$head(includeScript='google_analytics.js'),  
+  tags$head(includeScript('google_analytics.js')),  
   #Application Title
   titlePanel("AIM Sampling Sufficiency Calculator"),
   
