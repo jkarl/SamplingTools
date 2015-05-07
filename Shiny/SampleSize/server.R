@@ -2,6 +2,7 @@ library(shiny)
 library(xlsx)
 library(pwr)
 library(ggplot2)
+library(reshape2)
 
 #Define server logic for Shiny app
 shinyServer(function(input,output,session) {
@@ -31,7 +32,7 @@ shinyServer(function(input,output,session) {
     anType = input$analysisType
     rho = input$Rho
     prop = input$PropData
-    nRange = seq(3,100)
+    nRange = seq(3,100,by=3)
     a$results.tab = data.frame(matrix(nrow=1,ncol=9))
     names(a$results.tab)=c("stratum","indicator","mean","stdev","n.actual","coef.var","actualMDD","power","n.desired.mdd")
     a$sim.tab <- data.frame("stratum"="", "indicator"="","n"=0,"pwr"=0)
@@ -44,51 +45,51 @@ shinyServer(function(input,output,session) {
         #Calculate power stats
         xbar1 <- mean(x.i)
         s1 <- var(x.i)
-        if (xbar1==0 & s1==0) break  ## trap for indicators not measured by stratum
-        n <- length(x.i)
-        cv <- xbar1/sqrt(s1)
-        xbar2 = xbar1 + mddPct*xbar1
-        if (xbar2<0) xbar2=0; if(xbar2>1) xbar2=1
-        
-        ## Calculate effect size (actual MDD) and power based on selected analysis type: "Threshold Test","Two Independent Samples","Repeated Measures"
-        if (anType=="Threshold Test") {
-          sp = sqrt( (n-1)*s1/n  )
-          d = (xbar2-xbar1)/sp
-          type = "one.sample"
-          altern = "two.sided"
-        } else if (anType=="Two Independent Samples") {
-          sp = sqrt( (n-1)*s1/n  )
-          d = (xbar2-xbar1)/sp
-          type = "two.sample"
-          altern = "two.sided"
-        } else {  # assume paired
-          sp = sqrt( (n-1)/n*s1*2*(1-rho) )
-          d = (xbar2-xbar1)/sp
-          type = "paired"
-          altern = "two.sided"
+        if (!(xbar1==0 & s1==0)) { #break  ## trap for indicators not measured by stratum
+          n <- length(x.i)
+          cv <- sqrt(s1)/xbar1
+          xbar2 = xbar1 + mddPct*xbar1
+          if (xbar2<0) xbar2=0; if(xbar2>1) xbar2=1
+          
+          ## Calculate effect size (actual MDD) and power based on selected analysis type: "Threshold Test","Two Independent Samples","Repeated Measures"
+          if (anType=="Threshold Test") {
+            sp = sqrt( (n-1)*s1/n  )
+            d = (xbar2-xbar1)/sp
+            type = "one.sample"
+            altern = "two.sided"
+          } else if (anType=="Two Independent Samples") {
+            sp = sqrt( (n-1)*s1/n  )
+            d = (xbar2-xbar1)/sp
+            type = "two.sample"
+            altern = "two.sided"
+          } else {  # assume paired
+            sp = sqrt( (n-1)/n*s1*2*(1-rho) )
+            d = (xbar2-xbar1)/sp
+            type = "paired"
+            altern = "two.sided"
+          }
+          
+          if (prop) {
+            p = pwr.p.test(n=n,h=d,sig.level=alpha,alternative=altern)$power
+            desired.n = pwr.p.test(power=0.8,h=d,sig.level=alpha,alternative=altern)$n
+          } else {
+            p = pwr.t.test(n=n,d=d,sig.level=alpha,type=type,alternative=altern)$power
+            desired.n = pwr.t.test(power=0.8,d=d,sig.level=alpha,type=type,alternative=altern)$n        
+          }
+          
+          
+          
+          #Write results to the table
+          a$results.tab = rbind(a$results.tab,c(strat,l,xbar1,sqrt(s1),n,cv,d,p,desired.n))
+          
+          # Generate power curve data and write to sim.tab
+          for (nSim in nRange) {
+            pSim = pwr.t.test(n=nSim,d=d,sig.level=alpha,type="one.sample",alternative="two.sided")
+            #print(paste(l,nSim,pSim$power,sep=", "))
+            a$sim.tab = rbind(a$sim.tab,data.frame("stratum"=strat,"indicator"=l,"n"=nSim,"pwr"=pSim$power))
+            #plotArr[nSim-2]=pSim$power
+          }
         }
-        
-        if (prop) {
-          p = pwr.p.test(n=n,h=d,sig.level=alpha,alternative=altern)$power
-          desired.n = pwr.p.test(power=0.8,h=d,sig.level=alpha,alternative=altern)$n
-        } else {
-          p = pwr.t.test(n=n,d=d,sig.level=alpha,type=type,alternative=altern)$power
-          desired.n = pwr.t.test(power=0.8,d=d,sig.level=alpha,type=type,alternative=altern)$n        
-        }
-        
-        
-        
-        #Write results to the table
-        a$results.tab = rbind(a$results.tab,c(strat,l,xbar1,sqrt(s1),n,cv,d,p,desired.n))
-        
-        # Generate power curve data and write to sim.tab
-        for (nSim in nRange) {
-          pSim = pwr.t.test(n=nSim,d=d,sig.level=alpha,type="one.sample",alternative="two.sided")
-          #print(paste(l,nSim,pSim$power,sep=", "))
-          a$sim.tab = rbind(a$sim.tab,data.frame("stratum"=strat,"indicator"=l,"n"=nSim,"pwr"=pSim$power))
-          #plotArr[nSim-2]=pSim$power
-        }
-  
       } 
     }  
 
@@ -99,7 +100,7 @@ shinyServer(function(input,output,session) {
   })
   
   makePlot <- reactive({
-    g = ggplot(data=a$sim.tab, aes(x=n,y=pwr,color=indicator))+geom_line()+geom_vline(data=a$results.tab,aes(xintercept=as.numeric(15),linetype="dashed"))
+    g = ggplot(data=a$sim.tab, aes(x=n,y=pwr,color=indicator))+geom_line() #+geom_vline(data=a$results.tab,aes(xintercept=as.numeric(15),linetype="dashed"))
     g+facet_wrap(~stratum)
   })
   
@@ -152,10 +153,25 @@ shinyServer(function(input,output,session) {
       return(NULL)
     
     if(infile$type=="text/csv") {
-      a$data = read.csv(infile$datapath,header=TRUE)
+      if(input$fileType=="DIMA Indicator File") {
+        a$data = read.csv(infile$datapath,header=TRUE)  
+      } else {
+        temp = read.csv(infile$datapath,header=TRUE)
+        temp2 = melt(temp,id.vars=c(1,2,3))
+        names(temp2)[4:5] = c("Indicators","Ind_Values")
+        a$data = temp2
+      }
+      
     } else {
       if(infile$type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-        a$data = read.xlsx(infile$datapath,sheetName="Plot Totals")
+        if(input$fileType=="DIMA Indicator File") {
+          a$data = read.xlsx(infile$datapath,sheetName="Plot Totals")  
+        } else {
+          temp = read.xlsx(infile$datapath,1)  ## Read the first sheet in the XLS(X) file
+          a$data = melt(temp,id.vars=c(1,2,3))
+          names(a$data)[4:5] = c("Indicators","Ind_Values")
+        }
+        
       }
     }    
     

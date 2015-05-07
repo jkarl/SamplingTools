@@ -5,17 +5,19 @@ htmlText = '<p>This tool allows for calculation of sampling sufficiency based on
 
 # Define UI for application that calculates sample sizes and sampling sufficiency from a set of input data
 shinyUI(fluidPage(
-  tags$head(includeScript('google_analytics.js')),  
+  #tags$head(includeScript('google_analytics.js')),  
   #Application Title
-  titlePanel("AIM Sampling Sufficiency Calculator"),
+  titlePanel("Sampling Sufficiency Calculator"),
   
   #######################################################################################
   ## Sidebar for inputs and options
   #######################################################################################
   sidebarLayout(   #Tells Shiny that we're using a page layout with a Sidebar
-    sidebarPanel(  #Initializes the sidebar
-      fileInput("file1",h4("Load DIMA Indicator File"), multiple=FALSE),
-      
+    sidebarPanel(  #Initializes the sidebar      
+      h4("Load Indicator File..."),
+      selectInput("fileType","File Type",c("DIMA Indicator File","Generic Indicator File"),selected="DIMA Indicator File"),
+      fileInput("file1",h5("(Indicator File (.xls, .xlsx, or .csv)"), multiple=FALSE),
+      HTML("<br>"),
       h4("Input Options"),
       uiOutput("ChooseStrata"),
       uiOutput("ChoosePlotID"),
@@ -32,10 +34,8 @@ shinyUI(fluidPage(
       
       HTML("<br>"),
       actionButton("goButton",h4("Rerun Analysis")),
-      HTML("<br><br>"),
-      img(src="http://jornada.nmsu.edu/sites/jornada.nmsu.edu/files/JornadaLogo.png")
-      #h4("Output Options"),
-      #sliderInput("bins","Number of Bins:",min=1,max=50,value=30)
+      hr(),
+      img(src="http://dev.landscapetoolbox.org/wp-content/uploads/2015/01/JER_BLM_logos.png")
       
       
       ),
@@ -55,6 +55,5 @@ shinyUI(fluidPage(
       )
     
     )
-  ),
-  HTML("footer goes here...")
+  )
   ))
