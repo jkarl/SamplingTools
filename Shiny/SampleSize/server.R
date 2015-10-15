@@ -42,9 +42,10 @@ shinyServer(function(input,output,session) {
       for (l in levels(a$data[[indField]])) {
         data.sub <- a$data[a$data[[indField]]==l&a$data[[stratField]]==strat,]
         x.i = data.sub[[valField]]
+        x.i[is.na(x.i)] <- 0
         #Calculate power stats
-        xbar1 <- mean(x.i)
-        s1 <- var(x.i)
+        xbar1 <- mean(x.i, na.rm=TRUE)
+        s1 <- var(x.i, na.rm=TRUE)
         if (!(xbar1==0 & s1==0)) { #break  ## trap for indicators not measured by stratum
           n <- length(x.i)
           cv <- sqrt(s1)/xbar1
