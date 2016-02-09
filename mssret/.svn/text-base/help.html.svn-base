@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+</head>
+
+<body>
+<p><strong>About MSSRET</strong><br/><br />
+  The Multi-scale Sample Requirements Evaluation Tool (MSSRET)  is a tool for calculating the number of plots and samples per plot needed to  detect a given minimum detectable difference between two sampling efforts  (e.g., repeated measurements of an area over time for monitoring, comparing  treatment and control areas). MSSRET can also be used to assess whether or not  the intensity of sampling within a project was sufficient to meet project  objectives.<br /><br/>
+  <strong>Sample Requirements</strong><br /><br/>
+  Sampling requirements are the number of plots and samples  per plot needed to meet the sampling objectives. Sampling requirements are  calculated from the variability (i.e., variance) of the property being  measured, the magnitude of the difference to be detected (minimum detectable difference,  MDD), the correlation between measurements (rho), and the desired level of  precision and acceptable error rates (alpha and power).<br/><br />
+  <strong>Multi-Scale Sampling</strong><br /><br/>
+  &quot;Multi-scale&quot; refers to the arrangement and  spacing of samples. Multi-scale sampling occurs whenever multiple samples are  taken at a single sample site. In this case, samples within a plot are  relatively close together (fine or within-plot scale), whereas plots are  usually spread out across the project area (local or regional scale). MSSRET  works by evaluating the within-plot and between-plot variance from pilot data  supplied by the user. However, MSSRET can also be used to estimate single-scale  sample requirements.<br clear="all" /><br/>
+</p>
+<p><strong>Using MSSRET</strong><br /><br/>
+  MSSRET can be used in two ways: to help determine how many  samples are needed to detect a given minimum detectable difference (pre-project  sampling requirements), or to assess whether or not the number of samples taken  in a project could detect a given minimum detectable difference (post-project  sampling sufficiency).<br /><br/>
+  <strong>For pre-project  sampling requirements, you will need to input the following information to use  MSSRET:</strong><br/><br />
+  1.Data on your variable of interest collected from multiple  locations within a plot and on up to 10 plots. These can either be pilot data  or data from a previous study. It can be entered manually or loaded from an  Excel spreadsheet.<br />
+  2.(Optional) Acceptable type I error rate (alpha) and  statistical power (1-beta) and correlation between samples. Default values for  these parameters are supplied. MSSRET will calculate the number of samples  needed for several different minimum detectable difference levels. <br />
+  MSSRET will then calculate the necessary samples for  different levels of minimum detectable difference (MDD). The MDD is expressed  in both relative (i.e., percent difference) and absolute (i.e., in units of  your measured parameter) terms.<br/><br />
+  <strong>For post-project  sampling sufficiency, you will need to enter the following additional  information:</strong><br/><br />
+  1. The mean and within- and between-plot variances from your  sampling effort. Or, if 10 or fewer plots were sampled, then you can input the  data directly into MSSRET or import it via Excel spreadsheet and let MSSRET  calculate it for you.<br />
+  2. The number of plots actually sampled,<br />
+  3. The number of samples taken per plot,<br />
+  4. (Optional) Acceptable Type I error rate (alpha),  statistical power (1-beta) and correlation between samples if values other than  the default are being used, and<br />
+  5. The desired MDD.<br /><br/>
+  MSSRET will then calculate the actual MDD of your sampling  at plot and project/regional scales.<br />
+  <strong>Detailed help and  tutorials on the MSSRET tool can be found at:</strong> <u><a href="http://www.landscapetoolbox.org/mssret/help.html">http://www.landscapetoolbox.org/mssret/help</a>.</u></p>
+</body>
+</html>
