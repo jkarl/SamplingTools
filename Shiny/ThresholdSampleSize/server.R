@@ -29,8 +29,8 @@ N.plot <- function(p=0.5,p0=0.2,alpha=0.2,beta=0.2,moe=0.1) {
 
 shinyServer(function(input,output) {
 
-  output$nEst <- renderText(calcN(p=input$p,p0=input$p0,alpha=input$alpha,beta=1-input$power))
+  output$nEst <- renderText(calcN(p=input$p,p0=input$p0,alpha=input$alpha,beta=input$beta))
   output$mEst <- renderText(n.moe(p=input$p,alpha=input$alpha,moe=input$moe))
-  output$recommendedN <- renderPrint(cat(min(calcN(p=input$p,p0=input$p0,alpha=input$alpha,beta=1-input$power),n.moe(p=input$p,alpha=input$alpha,moe=input$moe))))
-  output$sampPlot <- renderPlot(N.plot(p=input$p,p0=input$p0,alpha=input$alpha,beta=1-input$power,moe=input$moe))
+  output$recommendedN <- renderPrint(cat(min(calcN(p=input$p,p0=input$p0,alpha=input$alpha,beta=input$beta),n.moe(p=input$p,alpha=input$alpha,moe=input$moe))))
+  output$sampPlot <- renderPlot(N.plot(p=input$p,p0=input$p0,alpha=input$alpha,beta=input$beta,moe=input$moe))
   })
